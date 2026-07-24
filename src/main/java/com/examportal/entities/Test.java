@@ -5,53 +5,44 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name="test")
+@Table(name = "test")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Test {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "test_id")
-    private Long TestId;
-	
-	@Column(name = "student_score")
-    private BigDecimal studentScore;
+    private Long testId;
 
-    @Column(name = "attempted_date")
-    private LocalDateTime attemptedDate;
-    
-    //many tests --> 1 course
-    //owning side, manytoone
+    @Column(name = "total_score")
+    private BigDecimal totalScore;
+
+    @Column(name = "schedule_time")
+    private LocalDateTime scheduleTime;
+
+    @Column(name = "due_time")
+    private LocalDateTime dueTime;
+
+    @Column(name = "time_alloted")
+    private Integer timeAlloted;
+
+    // Many Tests -> One Course
     @ManyToOne
-    @JoinColumn(name="course_id")
-    private Courses courses;
-    
-    //1 test --> * answers, onetomany
-    @OneToMany(mappedBy="test")
+    @JoinColumn(name = "course_id")
+    private Courses course;
+
+    // One Test -> Many Questions
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<Questions> questions = new ArrayList<>();
-    
-    //1 test --> * studentTests 
-    @OneToMany(mappedBy="test")
+
+    // One Test -> Many Student Tests
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL)
     private List<StudentTests> studentTests = new ArrayList<>();
 }
-
-
-

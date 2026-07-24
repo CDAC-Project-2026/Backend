@@ -1,4 +1,5 @@
 package com.examportal.entities;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,41 +17,42 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="student")
+@Table(name = "student")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Student {
-	
+
+	// Primary key for Student table
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="student_id")
+	@Column(name = "student_id")
 	private Long studentId;
-	
+
+	// Basic student details
 	private String name;
-	
+
 	@Column(unique = true)
 	private String email;
-	
+
 	private String password;
-	
+
 	private String phone;
-	
+
 	private String city;
-	
-	@Column(name="rank")
+
+	@Column(name = "rank")
 	private Integer studentRank;
-	
-	//1 student can be enrolled in multiple courses, hence they can have a list of enrollment details
-	//1 student --> * enrollments
-	@OneToMany(mappedBy ="student",cascade = CascadeType.ALL)
+
+	// One student can enroll in multiple courses
+	// The foreign key is maintained in StudentEnrolledCourses
+	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
 	private List<StudentEnrolledCourses> enrolledCourses = new ArrayList<>();
-	
-	//1 student can have many test. 
-	//1 student --> * tests
-	//one to many
-	@OneToMany(mappedBy="", cascade = CascadeType.ALL)
-	private List<StudentTests> tests = new ArrayList<>();
+
+	// One student can attempt multiple tests
+	// StudentTests is the owning side because it stores student_id
+	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+	private List<StudentTests> studentTests = new ArrayList<>();
 
 }
