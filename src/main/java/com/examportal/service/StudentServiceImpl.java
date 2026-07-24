@@ -6,6 +6,10 @@ import com.examportal.custom_exceptions.ResourceAlreadyExistsException;
 import com.examportal.dtos.Registration;
 import com.examportal.entities.Student;
 import com.examportal.repository.StudentRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import com.examportal.custom_exceptions.InvalidCredentialsException;
+import com.examportal.dtos.LoginRequest;
+import java.util.Optional;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class StudentServiceImpl implements StudentService {
 
 	private final StudentRepository studentRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	public String registerStudent(Registration request) {
@@ -30,7 +35,8 @@ public class StudentServiceImpl implements StudentService {
 
 		student.setName(request.getName());
 		student.setEmail(request.getEmail());
-		student.setPassword(request.getPassword()); // BCrypt encoding will be added later
+		// Encrypt the password before storing it in the database.
+		student.setPassword(passwordEncoder.encode(request.getPassword()));
 		student.setPhone(request.getPhone());
 		student.setCity(request.getCity());
 
@@ -40,10 +46,25 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public String loginStudent(String email, String password) {
+	public String loginStudent(LoginRequest request) {
 
-		// Login logic will be implemented after JWT configuration.
-		return "Login API Pending";
+		// Find the student using the email entered during login.
+		Optional<Student> optionalStudent =
+				studentRepository.findByEmail(request.getEmail());
+
+		// Email not found in the database.
+		if (optionalStudent.isEmpty()) {
+			throw new InvalidCredentialsException("Invalid email or password.");
+		}
+
+		Student student = optionalStudent.get();
+
+		// Compare the entered password with the encrypted password stored in the database.
+		if (!passwordEncoder.matches(request.getPassword(), student.getPassword())) {
+			throw new InvalidCredentialsException("Invalid email or password.");
+		}
+
+		return "Login successful.";
 
 	}
 

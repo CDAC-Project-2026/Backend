@@ -8,6 +8,7 @@ import com.examportal.custom_exceptions.ResourceAlreadyExistsException;
 import com.examportal.dtos.Registration;
 import com.examportal.dtos.ResponseDTO;
 import com.examportal.service.StudentService;
+import com.examportal.dtos.LoginRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,28 +16,32 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/student")
 @RequiredArgsConstructor
-public class StudentController {
+public class StudentController 
+{
 
 	private final StudentService studentService;
 
 	// Registers a new student after validating the request body.
 	@PostMapping("/register")
 	public ResponseEntity<ResponseDTO<String>> registerStudent(
-			@Valid @RequestBody Registration request) {
+			@Valid @RequestBody Registration request) 
+	{
 
-		try {
+		String message = studentService.registerStudent(request);
 
-			String message = studentService.registerStudent(request);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(new ResponseDTO<>("Success", message));
+	}
+	
+	// Authenticates a student using email and password.
+	@PostMapping("/login")
+	public ResponseEntity<ResponseDTO<String>> loginStudent(
+			@Valid @RequestBody LoginRequest request) {
 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					.body(new ResponseDTO<>("Success", message));
+		String message = studentService.loginStudent(request);
 
-		} catch (ResourceAlreadyExistsException e) {
-
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body(new ResponseDTO<>("Failed", e.getMessage()));
-
-		}
+		return ResponseEntity.ok(
+				new ResponseDTO<>("Success", message));
 
 	}
 

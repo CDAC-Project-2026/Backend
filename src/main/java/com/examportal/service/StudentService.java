@@ -1,5 +1,6 @@
 package com.examportal.service;
 
+import com.examportal.dtos.LoginRequest;
 import com.examportal.dtos.Registration;
 
 public interface StudentService {
@@ -9,6 +10,6 @@ public interface StudentService {
 
 	// Authenticates a student using email and password
 	// JWT token generation will be added in a later phase
-	String loginStudent(String email, String password);
+	String loginStudent(LoginRequest request);
 
 }
