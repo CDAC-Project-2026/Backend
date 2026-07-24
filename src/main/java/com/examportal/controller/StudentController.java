@@ -9,6 +9,7 @@ import com.examportal.dtos.Registration;
 import com.examportal.dtos.ResponseDTO;
 import com.examportal.service.StudentService;
 import com.examportal.dtos.LoginRequest;
+import com.examportal.dtos.LoginResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class StudentController
 
 	private final StudentService studentService;
 
-	// Registers a new student after validating the request body.
+	// Registers a new student after validating the request body
 	@PostMapping("/register")
 	public ResponseEntity<ResponseDTO<String>> registerStudent(
 			@Valid @RequestBody Registration request) 
@@ -33,15 +34,15 @@ public class StudentController
 				.body(new ResponseDTO<>("Success", message));
 	}
 	
-	// Authenticates a student using email and password.
+	// Authenticates a student using email and password
 	@PostMapping("/login")
-	public ResponseEntity<ResponseDTO<String>> loginStudent(
+	ResponseEntity<ResponseDTO<LoginResponse>> loginStudent(
 			@Valid @RequestBody LoginRequest request) {
 
-		String message = studentService.loginStudent(request);
+		LoginResponse response = studentService.loginStudent(request);
 
 		return ResponseEntity.ok(
-				new ResponseDTO<>("Success", message));
+				new ResponseDTO<>("Success", response));
 
 	}
 
