@@ -7,15 +7,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ResponseDTO<T> {
-	private String message;
+
+	// Indicates whether the request was successful.
+	private String status;
+
+	// Holds the actual response returned to the client.
 	private T data;
-	
-	public ResponseDTO(String message) {
-		super();
-		this.message = message;
+
+	public ResponseDTO(String status) {
+		this.status = status;
 		this.data = null;
 	}
+
 }

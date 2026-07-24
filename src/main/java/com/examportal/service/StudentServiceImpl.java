@@ -13,26 +13,38 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class StudentServiceImpl implements StudentService{
-	
-	private final StudentRepository studentrepo;
-	
+public class StudentServiceImpl implements StudentService {
+
+	private final StudentRepository studentRepository;
+
 	@Override
 	public String registerStudent(Registration request) {
-		if(studentrepo.existsByEmail(request.getEmail())) {
-			throw new ResourceAlreadyExistsException("Already Registered");
+
+		// Prevent duplicate registration using the same email.
+		if (studentRepository.existsByEmail(request.getEmail())) {
+			throw new ResourceAlreadyExistsException("Student is already registered with this email.");
 		}
-		
-		Student s = new Student();
-		s.setName(request.getName());
-		s.setEmail(request.getEmail());
-		s.setPassword(request.getPassword());
-		s.setCity(request.getCity());
-		s.setPhone(request.getPhone());
-		
-		studentrepo.save(s);
-		
-		return "Registration Successfull";
+
+		// Create a new Student entity from the registration request.
+		Student student = new Student();
+
+		student.setName(request.getName());
+		student.setEmail(request.getEmail());
+		student.setPassword(request.getPassword()); // BCrypt encoding will be added later
+		student.setPhone(request.getPhone());
+		student.setCity(request.getCity());
+
+		studentRepository.save(student);
+
+		return "Student registered successfully.";
+	}
+
+	@Override
+	public String loginStudent(String email, String password) {
+
+		// Login logic will be implemented after JWT configuration.
+		return "Login API Pending";
+
 	}
 
 }
