@@ -45,5 +45,14 @@ public class StudentController
 				new ResponseDTO<>("Success", response));
 
 	}
+	
+	// Used to verify that JWT authentication is working i.e  TESTING AAHE...!!!  
+	@GetMapping("/profile")
+	public ResponseEntity<ResponseDTO<String>> getProfile() {
+
+		return ResponseEntity.ok(
+				new ResponseDTO<>("Success", "You are authenticated!")
+		);
+	}
 
 }
