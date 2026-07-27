@@ -32,6 +32,8 @@ public class Admin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "admin_id")
     private Long adminId;
+    
+	private String name;
 
     private String password;
     
