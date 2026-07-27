@@ -15,6 +15,9 @@ import com.examportal.security.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -26,6 +29,14 @@ public class SecurityConfig {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+	
+	// Provides Spring Security's AuthenticationManager bean.
+	@Bean
+	public AuthenticationManager authenticationManager(
+	        AuthenticationConfiguration configuration) throws Exception {
+
+	    return configuration.getAuthenticationManager();
 	}
 
 	// Security configuration for application endpoints
@@ -40,21 +51,29 @@ public class SecurityConfig {
 	    .sessionManagement(session ->
 	            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-	    // Public and protected endpoints.
 	    .authorizeHttpRequests(auth -> auth
 
-	    	    // Public APIs
+	    	    // Public endpoints
 	    	    .requestMatchers(
 	    	            "/student/register",
 	    	            "/student/login",
+	    	            "/admin/login",
 	    	            "/swagger-ui/**",
 	    	            "/v3/api-docs/**"
 	    	    ).permitAll()
 
-	    	    // Everything else requires JWT
+	    	    // Student APIs
+	    	    .requestMatchers("/student/**")
+	    	    .hasRole("STUDENT")
+
+	    	    // Admin APIs
+	    	    .requestMatchers("/admin/**")
+	    	    .hasRole("ADMIN")
+
+	    	    // Any other endpoint must be authenticated.
 	    	    .anyRequest().authenticated()
 	    	)
-
+	    
 	    // Execute our JWT filter before Spring's authentication filter
 	    .addFilterBefore(
 	            jwtAuthenticationFilter,

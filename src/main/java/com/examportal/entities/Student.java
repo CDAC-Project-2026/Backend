@@ -16,6 +16,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.examportal.enums.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 @Entity
 @Table(name = "student")
 @Getter
@@ -44,6 +48,11 @@ public class Student {
 
 	@Column(name = "rank")
 	private Integer studentRank;
+	
+	// Role assigned to the student.
+	// Stored as text in the database.
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
 	// One student can enroll in multiple courses
 	// The foreign key is maintained in StudentEnrolledCourses
