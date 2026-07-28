@@ -31,5 +31,13 @@ public class GlobalExceptionHandler {
 
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 	}
+	
+	//misssing resource lookups
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<ResponseDTO<String>> handleResourceNotFound(ResourceNotFoundException e){
+		ResponseDTO<String> response = new ResponseDTO<>("Failed",e.getMessage());
+		
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	}
 
 }

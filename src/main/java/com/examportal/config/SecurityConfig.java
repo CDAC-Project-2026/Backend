@@ -45,7 +45,7 @@ public class SecurityConfig {
 
 		http
 	    // JWT based APIs don't use CSRF protection
-	    .csrf(csrf -> csrf.disable())
+	    .csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
 
 	    // Don't create HTTP sessions Every request must carry a JWT
 	    .sessionManagement(session ->
