@@ -38,7 +38,6 @@ public class AdminServiceImpl implements AdminService {
     
     private final StudentRepository studentRepository;
     
-    private static final String DEFAULT_PASSWORD = "Welcome@123";
 
 	@Override
 	public AdminProfileResponse getProfile() {
@@ -146,13 +145,17 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public String createUser(CreateUserRequest request) {
 
-	    // Check if email already exists in either Student or Admin table.
+	    // Check if email already exists.
 	    if (studentRepository.existsByEmail(request.getEmail())
 	            || adminRepository.existsByEmail(request.getEmail())) {
 
 	        throw new ResourceAlreadyExistsException(
 	                "User already exists with this email.");
 	    }
+
+	    // Generate default password.
+	    String defaultPassword =
+	            request.getEmail().split("@")[0] + "@123";
 
 	    // Create Student
 	    if (request.getRole() == Role.STUDENT) {
@@ -161,30 +164,25 @@ public class AdminServiceImpl implements AdminService {
 
 	        student.setName(request.getName());
 	        student.setEmail(request.getEmail());
-	        student.setPassword(
-	                passwordEncoder.encode(DEFAULT_PASSWORD));
+	        student.setPassword(passwordEncoder.encode(defaultPassword));
 	        student.setRole(Role.STUDENT);
 
 	        studentRepository.save(student);
 
-	        return "Student created successfully.";
+	        return "Student created successfully. Default Password: " + defaultPassword;
 	    }
 
 	    // Create Admin
-	    else {
+	    Admin admin = new Admin();
 
-	        Admin admin = new Admin();
+	    admin.setName(request.getName());
+	    admin.setEmail(request.getEmail());
+	    admin.setPassword(passwordEncoder.encode(defaultPassword));
+	    admin.setRole(Role.ADMIN);
 
-	        admin.setName(request.getName());
-	        admin.setEmail(request.getEmail());
-	        admin.setPassword(
-	                passwordEncoder.encode(DEFAULT_PASSWORD));
-	        admin.setRole(Role.ADMIN);
+	    adminRepository.save(admin);
 
-	        adminRepository.save(admin);
-
-	        return "Admin created successfully.";
-	    }
+	    return "Admin created successfully. Default Password: " + defaultPassword;
 	}
 	
 	@Override
