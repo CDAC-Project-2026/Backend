@@ -19,6 +19,12 @@ public class CreateUserRequest {
     @NotBlank
     private String email;
 
+    @NotBlank
+    private String phone;
+
+    private String city;          // Required only for Student
+
+
     @NotNull
     private Role role;
 }

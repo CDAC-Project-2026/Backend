@@ -1,4 +1,4 @@
-package com.examportal.dtos;
+	package com.examportal.dtos;
 
 import lombok.Getter;
 import lombok.Setter;

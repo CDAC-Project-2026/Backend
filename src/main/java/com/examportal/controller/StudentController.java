@@ -12,6 +12,7 @@ import com.examportal.dtos.UpdateStudentProfileRequest;
 import com.examportal.service.AuthenticationService;
 import com.examportal.service.StudentService;
 import com.examportal.dtos.ChangePasswordRequest;
+import com.examportal.dtos.DeleteAccountRequest;
 import com.examportal.dtos.LoginRequest;
 import com.examportal.dtos.LoginResponse;
 
@@ -77,5 +78,17 @@ public class StudentController
 	            new ResponseDTO<>(
 	                    "Success",
 	                    studentService.changePassword(request)));
+	}
+	
+	@DeleteMapping("/account")
+	public ResponseEntity<ResponseDTO<String>> deleteAccount(
+	        @RequestBody DeleteAccountRequest request) {
+
+	    return ResponseEntity.ok(
+	            new ResponseDTO<>(
+	                    "Success",
+	                    studentService.deleteAccount(request)
+	            )
+	    );
 	}
 }

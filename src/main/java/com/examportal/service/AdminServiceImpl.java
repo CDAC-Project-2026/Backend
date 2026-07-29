@@ -160,10 +160,18 @@ public class AdminServiceImpl implements AdminService {
 	    // Create Student
 	    if (request.getRole() == Role.STUDENT) {
 
+	        if (request.getCity() == null || request.getCity().isBlank()) {
+	            throw new IllegalArgumentException("City is required for Student.");
+	        }
+
+
 	        Student student = new Student();
 
-	        student.setName(request.getName());
-	        student.setEmail(request.getEmail());
+	        student.setName(request.getName().trim());
+	        student.setEmail(request.getEmail().trim());
+	        student.setPhone(request.getPhone().trim());
+	        student.setCity(request.getCity().trim());
+	        
 	        student.setPassword(passwordEncoder.encode(defaultPassword));
 	        student.setRole(Role.STUDENT);
 
@@ -175,8 +183,10 @@ public class AdminServiceImpl implements AdminService {
 	    // Create Admin
 	    Admin admin = new Admin();
 
-	    admin.setName(request.getName());
-	    admin.setEmail(request.getEmail());
+	    admin.setName(request.getName().trim());
+	    admin.setEmail(request.getEmail().trim());
+	    admin.setPhone(request.getPhone().trim());
+
 	    admin.setPassword(passwordEncoder.encode(defaultPassword));
 	    admin.setRole(Role.ADMIN);
 

@@ -29,27 +29,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final UserDetailsService userDetailsService;
 
 	@Override
-	protected void doFilterInternal(
-			@NonNull HttpServletRequest request,
-			@NonNull HttpServletResponse response,
-			@NonNull FilterChain filterChain)
-			throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request,
+	                                HttpServletResponse response,
+	                                FilterChain filterChain)
+	        throws ServletException, IOException {
 
-		// Read the Authorization header sent by the client.
-		final String authHeader = request.getHeader("Authorization");
+	    System.out.println("URL = " + request.getRequestURI());
 
-		// If the header is missing or doesn't start with "Bearer ",
-		// skip JWT processing and continue with the request.
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			filterChain.doFilter(request, response);
-			return;
-		}
+	    final String authHeader = request.getHeader("Authorization");
+	    System.out.println("Authorization = " + authHeader);
 
-		// Remove "Bearer " and keep only the JWT token
-		final String jwt = authHeader.substring(7);
+	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	        System.out.println("No Bearer token");
+	        filterChain.doFilter(request, response);
+	        return;
+	    }
 
-		// Email stored inside the JWT.
-		final String email = jwtService.extractUsername(jwt);
+	    final String jwt = authHeader.substring(7);
+	    System.out.println("JWT = " + jwt);
+
+	    final String email = jwtService.extractUsername(jwt);
+	    System.out.println("Email = " + email);
 		
 		
 
