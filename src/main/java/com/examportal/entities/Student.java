@@ -46,7 +46,7 @@ public class Student {
 
 	private String city;
 
-	@Column(name = "rank")
+	@Column(name = "studentRank")
 	private Integer studentRank;
 	
 	// Role assigned to the student.
