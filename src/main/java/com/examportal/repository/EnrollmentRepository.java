@@ -9,5 +9,7 @@ import com.examportal.entities.StudentEnrolledCourses;
 public interface EnrollmentRepository extends JpaRepository<StudentEnrolledCourses, Long>{
 	List<StudentEnrolledCourses> findByStudent_StudentId(Long StudentId);
 	
+	List<StudentEnrolledCourses> findByCourse_CourseId(Long courseId);
+	
 	boolean existsByStudent_StudentIdAndCourse_CourseId(Long studentId, Long courseId);
 }
