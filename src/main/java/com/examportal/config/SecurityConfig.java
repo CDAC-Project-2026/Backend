@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -44,6 +45,8 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		http
+	    .cors(Customizer.withDefaults())
+
 	    // JWT based APIs don't use CSRF protection
 	    .csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
 
@@ -77,11 +80,12 @@ public class SecurityConfig {
 	    // Execute our JWT filter before Spring's authentication filter
 	    .addFilterBefore(
 	            jwtAuthenticationFilter,
-	            UsernamePasswordAuthenticationFilter.class)
+	            UsernamePasswordAuthenticationFilter.class);
 
-	    .httpBasic(Customizer.withDefaults());
 
 		return http.build();
 	}
+	
+	
 
 }

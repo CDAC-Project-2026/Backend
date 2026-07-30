@@ -56,12 +56,20 @@ public class Student {
 
 	// One student can enroll in multiple courses
 	// The foreign key is maintained in StudentEnrolledCourses
-	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-	private List<StudentEnrolledCourses> enrolledCourses = new ArrayList<>();
+	@OneToMany(
+		    mappedBy = "student",
+		    cascade = CascadeType.ALL,
+		    orphanRemoval = true
+		)
+		private List<StudentEnrolledCourses> enrolledCourses = new ArrayList<>();
 
 	// One student can attempt multiple tests
 	// StudentTests is the owning side because it stores student_id
-	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-	private List<StudentTests> studentTests = new ArrayList<>();
+	@OneToMany(
+		    mappedBy = "student",
+		    cascade = CascadeType.ALL,
+		    orphanRemoval = true
+		)
+		private List<StudentTests> studentTests = new ArrayList<>();
 
 }

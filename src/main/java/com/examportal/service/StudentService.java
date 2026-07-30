@@ -2,6 +2,7 @@ package com.examportal.service;
 
 
 import com.examportal.dtos.ChangePasswordRequest;
+import com.examportal.dtos.DeleteAccountRequest;
 import com.examportal.dtos.Registration;
 import com.examportal.dtos.StudentProfileResponse;
 import com.examportal.dtos.UpdateStudentProfileRequest;
@@ -16,5 +17,7 @@ public interface StudentService {
 	String updateProfile(UpdateStudentProfileRequest request);
 	
 	String changePassword(ChangePasswordRequest request);
+	
+	String deleteAccount(DeleteAccountRequest request);
 	
 }

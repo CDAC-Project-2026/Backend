@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.examportal.custom_exceptions.ResourceAlreadyExistsException;
 import com.examportal.dtos.ChangePasswordRequest;
+import com.examportal.dtos.DeleteAccountRequest;
 import com.examportal.dtos.Registration;
 import com.examportal.entities.Student;
 import com.examportal.enums.Role;
@@ -128,7 +129,25 @@ public class StudentServiceImpl implements StudentService {
 		
 	}
 	
-	
+	@Override
+	public String deleteAccount(DeleteAccountRequest request) {
+
+	    Authentication authentication =
+	            SecurityContextHolder.getContext().getAuthentication();
+
+	    String email = authentication.getName();
+
+	    Student student = studentRepository.findByEmail(email)
+	            .orElseThrow(() -> new RuntimeException("Student not found"));
+
+	    if (!passwordEncoder.matches(request.getPassword(), student.getPassword())) {
+	        throw new RuntimeException("Incorrect password.");
+	    }
+
+	    studentRepository.delete(student);
+
+	    return "Account deleted successfully.";
+	}
 
 	
 
