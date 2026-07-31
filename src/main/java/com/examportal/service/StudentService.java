@@ -1,15 +1,25 @@
 package com.examportal.service;
 
 
-import java.util.List;
-
+import com.examportal.dtos.ChangePasswordRequest;
+import com.examportal.dtos.DeleteAccountRequest;
 import com.examportal.dtos.Registration;
+import com.examportal.dtos.StudentProfileResponse;
+import com.examportal.dtos.UpdateStudentProfileRequest;
 import com.examportal.dtos.StudentDashboardDTO;
 
 public interface StudentService {
 
+	// Registers a new student after validating the request
 	String registerStudent(Registration request);
 
-	StudentDashboardDTO getDashboard(Long studentId);
+	StudentProfileResponse getProfile();
+	
+	String updateProfile(UpdateStudentProfileRequest request);
+	
+	String changePassword(ChangePasswordRequest request);
+	
+	String deleteAccount(DeleteAccountRequest request);
 
+	StudentDashboardDTO getDashboard(Long studentId);
 }

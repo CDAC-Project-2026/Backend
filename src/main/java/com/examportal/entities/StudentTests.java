@@ -55,7 +55,11 @@ public class StudentTests {
 
     //for 1 test, 1 student will have many answers.
     //1 studenttest (a paprticular test attempt)--> * answers
-    @OneToMany(mappedBy = "studenttest")
-    private List<StudentAnswers> answers = new ArrayList<>();
+    @OneToMany(
+    	    mappedBy = "studentTest",
+    	    cascade = CascadeType.ALL,
+    	    orphanRemoval = true
+    	)
+    	private List<StudentAnswers> answers = new ArrayList<>();
 	
 }

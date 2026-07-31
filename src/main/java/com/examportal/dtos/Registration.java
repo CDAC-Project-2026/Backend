@@ -10,18 +10,24 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Registration {
-	@NotBlank
+
+	// Student's full name
+	@NotBlank(message = "Name is required")
 	private String name;
-	
-	@Email
+
+	// Email is used as the unique login ID.
+	@NotBlank(message = "Email is required")
+	@Email(message = "Enter a valid email address")
 	private String email;
-	
-	@NotBlank
+
+	// Password will be encrypted using BCrypt before storing.
+	@NotBlank(message = "Password is required")
 	private String password;
-	
-	@NotBlank
+
+	@NotBlank(message = "Phone number is required")
 	private String phone;
-	
-	@NotBlank
+
+	@NotBlank(message = "City is required")
 	private String city;
+
 }

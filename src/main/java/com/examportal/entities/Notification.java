@@ -29,7 +29,7 @@ public class Notification {
 	
 	//* notifications --> 1 course
 	@ManyToOne
-	@JoinColumn(name="course_id")
+	@JoinColumn(name = "course_id")
 	private Courses course;
 	
 	@Column(columnDefinition = "TEXT")

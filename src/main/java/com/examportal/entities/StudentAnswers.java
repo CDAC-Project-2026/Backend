@@ -28,8 +28,8 @@ public class StudentAnswers {
 	//from studentTest perspective, (1 student + 1 test) -> many Student_answers
 	//* student_answers --> 1 studentTest
 	@ManyToOne
-	@JoinColumn(name="studentTest_id")
-	private StudentTests studenttest;
+	@JoinColumn(name = "student_test_id")
+	private StudentTests studentTest;
 	
 	//from question's perspective, 1 question --> * student answers
 	//* student answers --> 1 question 

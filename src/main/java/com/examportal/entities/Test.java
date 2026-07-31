@@ -21,22 +21,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="test")
+@Table(name = "test")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Test {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "test_id")
     private Long testId;
 	
-	@Column(name = "test_name")
-	private String testName;
+    @Column(name = "test_name")
+    private String testName;
 	
-	@Column(name = "total_score")
+	  @Column(name = "total_score")
     private BigDecimal totalScore;
 
     @Column(name = "schedule_time")
@@ -66,6 +66,3 @@ public class Test {
     @OneToMany(mappedBy="test", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentTests> studentTests = new ArrayList<>();
 }
-
-
-
