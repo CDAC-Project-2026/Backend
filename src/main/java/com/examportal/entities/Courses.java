@@ -53,7 +53,7 @@ public class Courses {
     private List<StudyMaterial> studyMaterials = new ArrayList<>();
     
     //1 course can have --> * tests
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "courses")
     private List<Test> tests = new ArrayList<>();
     
     //1 course can have --> * notifications

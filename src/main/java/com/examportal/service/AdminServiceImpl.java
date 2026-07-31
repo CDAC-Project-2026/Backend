@@ -18,11 +18,14 @@ import com.examportal.dtos.ChangePasswordRequest;
 import com.examportal.dtos.CreateUserRequest;
 import com.examportal.dtos.UpdateAdminProfileRequest;
 import com.examportal.dtos.UserResponse;
+import com.examportal.dtos.AdminDashboardDTO;
 import com.examportal.entities.Admin;
 import com.examportal.entities.Student;
 import com.examportal.enums.Role;
 import com.examportal.repository.AdminRepository;
 import com.examportal.repository.StudentRepository;
+import com.examportal.repository.CourseRepository;
+import com.examportal.repository.TestRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +40,10 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
     
     private final StudentRepository studentRepository;
+  
+    private final CourseRepository courseRepo;
     
+    private final TestRepository testRepo;
 
 	@Override
 	public AdminProfileResponse getProfile() {
@@ -249,6 +255,25 @@ public class AdminServiceImpl implements AdminService {
 	    }
 
 	    throw new ResourceNotFoundException("User not found.");
+	}
+  
+  
+  @Override
+	public AdminDashboardDTO getDashboardData() {
+
+		
+		long noOfStudents = studentRepository.count();
+		long noOfCourses = courseRepo.count();
+		long noOfTests = testRepo.count();
+		
+		System.out.println("noof student : " + noOfStudents + " no of courses : " + noOfCourses + " no of tests : " + noOfTests);
+		// average score
+		Double averageScore = 0.0;
+		
+		// logs
+		List<String> studentLogs = new ArrayList<>(List.of("Student logged in", "Student attempted a test"));
+			
+		return new AdminDashboardDTO(noOfStudents, noOfCourses, noOfTests, averageScore, studentLogs);
 	}
 
 }
