@@ -37,6 +37,7 @@ public class StudentAnswers {
 	@JoinColumn(name="ques_id")
 	private Questions question;
 	
-	private Integer answer_option;	
+	@Column(name = "answer_option")
+	private Integer answerOption;	
 	
 }

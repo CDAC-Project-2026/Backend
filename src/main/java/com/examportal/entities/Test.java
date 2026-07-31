@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,13 +31,25 @@ public class Test {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "test_id")
-    private Long TestId;
+    private Long testId;
 	
-	@Column(name = "student_score")
-    private BigDecimal studentScore;
+	@Column(name = "test_name")
+	private String testName;
+	
+	@Column(name = "total_score")
+    private BigDecimal totalScore;
 
-    @Column(name = "attempted_date")
-    private LocalDateTime attemptedDate;
+    @Column(name = "schedule_time")
+    private LocalDateTime scheduleTime;
+    
+    @Column(name = "due_date_time")
+    private LocalDateTime dueDateTime;
+    
+    @Column(name = "time_alloted")
+    private Integer timeAlloted;
+    
+    @Column(name = "draft")
+    private Boolean draft;
     
     //many tests --> 1 course
     //owning side, manytoone
@@ -45,11 +58,12 @@ public class Test {
     private Courses courses;
     
     //1 test --> * answers, onetomany
-    @OneToMany(mappedBy="test")
+    @OneToMany(mappedBy="test", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Questions> questions = new ArrayList<>();
     
     //1 test --> * studentTests 
-    @OneToMany(mappedBy="test")
+    //mappedBy tells JPA that Test is not the owner of this attribute
+    @OneToMany(mappedBy="test", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentTests> studentTests = new ArrayList<>();
 }
 

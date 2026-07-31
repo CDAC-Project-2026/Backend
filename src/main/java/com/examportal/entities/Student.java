@@ -39,7 +39,7 @@ public class Student {
 	
 	private String city;
 	
-	@Column(name="rank")
+	@Column(name="student_rank")
 	private Integer studentRank;
 	
 	//1 student can be enrolled in multiple courses, hence they can have a list of enrollment details
