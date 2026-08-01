@@ -14,6 +14,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SubmitTestDTO {
 	private Long testId;
-	private Long studentId;
 	private List<AnswerDTO> answers;
 }

@@ -116,12 +116,12 @@ public class AdminController {
     }
   
     @GetMapping("/dashboard")
-    public ResponseEntity<?> getAdminDashboard(){
-      try {
-        AdminDashboardDTO dashboard = adminService.getDashboardData();
-        return ResponseEntity.status(HttpStatus.OK).body(dashboard);
-      } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin Dashboard Data Not Found");
-      }
+    public ResponseEntity<ResponseDTO<AdminDashboardDTO>> getAdminDashboard(){
+  
+	    return ResponseEntity.ok(
+	            new ResponseDTO<>(
+	                    "Success",
+	                    adminService.getDashboardData()));
+      
     }
 }

@@ -10,14 +10,14 @@ import com.examportal.dtos.TestResultDetailDTO;
 
 public interface StudentTestsService {
 
-	List<StudentTestListDTO> getTestsCoursewise(Long studentId);
+	List<StudentTestListDTO> getTestsCoursewise();
 
-	TestAttemptDTO startTest(Long studentId, Long testId);
+	TestAttemptDTO startTest(Long testId);
 
 	String submitTest(SubmitTestDTO submitTest);
 	
-	List<AttemptedTestDTO> getResultList(Long studentId);
+	List<AttemptedTestDTO> getResultList();
 
-	TestResultDetailDTO getTestResult(Long studentId, Long testId);
+	TestResultDetailDTO getTestResult(Long testId);
 	
 }

@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.examportal.custom_exceptions.ResourceAlreadyExistsException;
 
 import com.examportal.dtos.Registration;
 import com.examportal.dtos.ResponseDTO;
@@ -95,15 +94,15 @@ public class StudentController
 	    );
 	}
   
-  @GetMapping("/{studentId}/dashboard")
-	public ResponseEntity<?> getDashboard(@PathVariable Long studentId){
-		try {
-			StudentDashboardDTO dashboardDTO = studentservice.getDashboard(studentId);
-			return ResponseEntity.status(HttpStatus.OK).body(dashboardDTO);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student Dashboard Not Found");
-		}
+  @GetMapping("/dashboard")
+	public ResponseEntity<ResponseDTO<StudentDashboardDTO>> getDashboard(){
+		
+			return ResponseEntity.ok(
+		            new ResponseDTO<>(
+		                    "Success",
+		                    studentService.getDashboard()
+		            )
+		);
 	}
   
   

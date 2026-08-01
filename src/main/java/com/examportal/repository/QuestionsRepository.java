@@ -16,7 +16,7 @@ public interface QuestionsRepository extends JpaRepository<Questions, Long>{
 	            q.correctAnswer, sa.answerOption)
 	        FROM Questions q
 	        LEFT JOIN StudentAnswers sa
-	            ON sa.question.queId = q.queId AND sa.studenttest.studentTestId = :studentTestId
+	            ON sa.question.queId = q.queId AND sa.studentTest.studentTestId = :studentTestId
 	        WHERE q.test.testId = :testId
 	        """)
 	    List<QuestionResultDTO> findQuestionResultsByTestAndStudentTest(
