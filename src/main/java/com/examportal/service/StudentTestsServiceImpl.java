@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.management.RuntimeErrorException;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.examportal.custom_exceptions.BadRequestException;
+import com.examportal.custom_exceptions.ForbiddenException;
 import com.examportal.custom_exceptions.ResourceNotFoundException;
 import com.examportal.dtos.AnswerDTO;
 import com.examportal.dtos.AttemptedTestDTO;
@@ -22,6 +21,7 @@ import com.examportal.dtos.SubmitTestDTO;
 import com.examportal.dtos.TestAttemptDTO;
 import com.examportal.dtos.TestResultDetailDTO;
 import com.examportal.entities.Questions;
+import com.examportal.entities.Student;
 import com.examportal.entities.StudentAnswers;
 import com.examportal.entities.StudentTests;
 import com.examportal.entities.Test;
@@ -29,34 +29,36 @@ import com.examportal.repository.StudentEnrolledCoursesRepository;
 import com.examportal.repository.StudentRepository;
 import com.examportal.repository.StudentTestsRepository;
 import com.examportal.repository.TestRepository;
+import com.examportal.utils.AuthUtil;
 import com.examportal.repository.QuestionsRepository;
 import com.examportal.repository.StudentAnswersRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class StudentTestsServiceImpl implements StudentTestsService{
 	
-	@Autowired
-	TestRepository testRepo;
+	private final TestRepository testRepo;
 	
-	@Autowired 
-	StudentTestsRepository studentTestsRepo;
+	private final StudentTestsRepository studentTestsRepo;
 	
-	@Autowired
-	StudentEnrolledCoursesRepository studentEnrolledCoursesRepo;
+	private final StudentEnrolledCoursesRepository studentEnrolledCoursesRepo;
 	
-	@Autowired
-	StudentRepository studentRepo;
+	private final StudentRepository studentRepo;
 	
-	@Autowired
-	StudentAnswersRepository studentAnswersRepo;
+	private final StudentAnswersRepository studentAnswersRepo;
 	
-	@Autowired
-	QuestionsRepository questionsRepo;
+	private final QuestionsRepository questionsRepo;
+	
+	private final AuthUtil authUtil;
 
 	@Override
-	public List<StudentTestListDTO> getTestsCoursewise(Long studentId) {
+	public List<StudentTestListDTO> getTestsCoursewise() {
+		
+		Long studentId = authUtil.getCurrentStudentId();
 		
 		List<StudentTestListDTO> testList = testRepo.findAvailableTestsForStudent(studentId);
 		
@@ -65,25 +67,26 @@ public class StudentTestsServiceImpl implements StudentTestsService{
 	}
 
 	@Override
-	@Transactional
-	public TestAttemptDTO startTest(Long studentId, Long testId) {
+	public TestAttemptDTO startTest(Long testId) {
+		
+		Long studentId = authUtil.getCurrentStudentId();
 		
 		Test test = testRepo.findById(testId).orElseThrow(() -> new ResourceNotFoundException("Test Not Found"));
 		
 		if(test.getDraft() == true) {
-			throw new RuntimeException("This test is not available yet for students");
+			throw new BadRequestException("This test is not available yet for students");
 		}
 		
 		if(test.getDueDateTime().isBefore(LocalDateTime.now())) {
-			throw new RuntimeException("This test cannot be attempted after the due date is passed");
+			throw new BadRequestException("This test cannot be attempted after the due date is passed");
 		}
 		
 		if(studentEnrolledCoursesRepo.existsByStudentStudentIdAndCourseCourseId(studentId, test.getCourses().getCourseId()) == false) {
-			throw new RuntimeException("Student is not enrolled to this course");
+			throw new ForbiddenException("Student is not enrolled to this course");
 		}
 		
 		if(studentTestsRepo.existsByStudentStudentIdAndTestTestId(studentId, testId) == true) {
-			throw new RuntimeException("Student has already attempted this test");
+			throw new BadRequestException("Student has already attempted this test");
 		}
 
 		
@@ -99,18 +102,18 @@ public class StudentTestsServiceImpl implements StudentTestsService{
 	}
 
 	@Override
-	@Transactional
 	public String submitTest(SubmitTestDTO request) {
 		
-		System.out.println("testId=" + request.getTestId() + ", studentId=" + request.getStudentId());
+		Student student = authUtil.getCurrentStudent();
+		
+		System.out.println("testId=" + request.getTestId() + ", studentId=" + student.getStudentId());
 		
 		Test test = testRepo.findById(request.getTestId())
 	            .orElseThrow(() -> new ResourceNotFoundException("Test not found"));
 
 	    // create the StudentTests record first
 	    StudentTests studentTest = new StudentTests();
-	    studentTest.setStudent(studentRepo.findById(request.getStudentId())
-	            .orElseThrow(() -> new ResourceNotFoundException("Student not found")));
+	    studentTest.setStudent(student);
 	    studentTest.setTest(test);
 	    studentTest.setAttemptedDate(LocalDateTime.now());
 
@@ -124,11 +127,18 @@ public class StudentTestsServiceImpl implements StudentTestsService{
 	        if (ans.getSelectedOption() == null) {
 	            continue; // skipped question — no answer row, no marks, no crash
 	        }
+	        
+	        //safety check
+	        if(ans.getSelectedOption() > 4 || ans.getSelectedOption() < 1) {
+	        	ans.setSelectedOption(null);
+	        	continue;
+	        }
+	        
 	        Questions question = questionMap.get(ans.getQuestionId());
 	        if (question == null) continue; // safety check, ignore invalid question IDs
 
 	        StudentAnswers answerEntity = new StudentAnswers();
-	        answerEntity.setStudenttest(studentTest);
+	        answerEntity.setStudentTest(studentTest);
 	        answerEntity.setQuestion(question);
 	        answerEntity.setAnswerOption(ans.getSelectedOption());
 	        answerEntities.add(answerEntity);
@@ -148,19 +158,18 @@ public class StudentTestsServiceImpl implements StudentTestsService{
 	
 	
 	@Override
-	@Transactional
-	public List<AttemptedTestDTO> getResultList(Long studentId) {
-		if (!studentRepo.existsById(studentId)) {
-	        throw new ResourceNotFoundException("Student not found");
-	    }
+	public List<AttemptedTestDTO> getResultList() {
+		
+		Long studentId = authUtil.getCurrentStudentId();
 		
 		List<AttemptedTestDTO> resultList = studentTestsRepo.findAttemptedTestsByStudent(studentId);
 		return resultList;
 	}
 
 	@Override
-	@Transactional
-	public TestResultDetailDTO getTestResult(Long studentId, Long testId) {
+	public TestResultDetailDTO getTestResult(Long testId) {
+		
+		Long studentId = authUtil.getCurrentStudentId();
 		StudentTests studentTest = studentTestsRepo.findByStudentIdAndTestId(studentId, testId)
 	            .orElseThrow(() -> new ResourceNotFoundException("This student has not attempted this test"));
 

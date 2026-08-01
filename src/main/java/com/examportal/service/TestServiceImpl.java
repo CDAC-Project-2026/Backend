@@ -1,39 +1,35 @@
 package com.examportal.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.examportal.custom_exceptions.BadRequestException;
 import com.examportal.custom_exceptions.ResourceNotFoundException;
-import com.examportal.dtos.CourseResultDTO;
 import com.examportal.dtos.TestListDTO;
 import com.examportal.entities.Courses;
 import com.examportal.entities.Questions;
 import com.examportal.entities.Test;
 import com.examportal.repository.CourseRepository;
 import com.examportal.repository.QuestionsRepository;
-import com.examportal.repository.StudentTestsRepository;
 import com.examportal.repository.TestRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class TestServiceImpl implements TestService{
 	
-	@Autowired
-	private TestRepository testRepo;
+	private final TestRepository testRepo;
 	
-	@Autowired
-	private QuestionsRepository questionRepo;
+	private final QuestionsRepository questionRepo;
 	
-	@Autowired
-	private CourseRepository courseRepo;
+	private final CourseRepository courseRepo;
 
 	
 	@Override 
-	@Transactional
 	public String createNewTest(Long courseId, Test test, List<Questions> questions) {
 
 		Courses courses = courseRepo.findById(courseId).orElseThrow(() -> new ResourceNotFoundException("Course Not Found"));
@@ -62,7 +58,6 @@ public class TestServiceImpl implements TestService{
 	}
 
 	@Override
-	@Transactional
 	public String publishTest(Long testId) {
 		Test test = testRepo.findById(testId).orElseThrow(() -> new ResourceNotFoundException("Test Not Found"));
 		
@@ -75,12 +70,11 @@ public class TestServiceImpl implements TestService{
 	}
 
 	@Override
-	@Transactional
 	public String editTest(Long testId, Test testEditted, List<Questions> questionsEditted) {
 		Test existingTest = testRepo.findById(testId).orElseThrow(() -> new ResourceNotFoundException("Test Not Found"));
 		
 		if(existingTest.getDraft() == false) {
-			throw new RuntimeException("Cannot edit published test");
+			throw new BadRequestException("Cannot edit published test");
 		}
 		
 		existingTest.setTotalScore(testEditted.getTotalScore());
@@ -101,16 +95,15 @@ public class TestServiceImpl implements TestService{
 	
 
 	@Override
-	@Transactional
 	public String deleteTest(Long testId) {
 		Test test = testRepo.findById(testId).orElseThrow(() -> new ResourceNotFoundException("Test Not Found"));
 		
 		if(test.getDraft() == false) {
-			throw new RuntimeException("Published test cannot be deleted.");
+			throw new BadRequestException("Published test cannot be deleted.");
 		}
 		
 		if(!test.getStudentTests().isEmpty()) {
-			throw new RuntimeException("Tests which students have attempted cannot be deleted.");
+			throw new BadRequestException("Tests which students have attempted cannot be deleted.");
 		}
 		
 		testRepo.delete(test);

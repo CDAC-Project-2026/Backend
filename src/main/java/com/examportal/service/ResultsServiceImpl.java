@@ -14,18 +14,18 @@ import com.examportal.repository.CourseRepository;
 import com.examportal.repository.StudentTestsRepository;
 import com.examportal.repository.TestRepository;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Service
+@RequiredArgsConstructor
 public class ResultsServiceImpl implements ResultsService{
 	
-	@Autowired 
-	private StudentTestsRepository studentTestsRepo;
+	private final StudentTestsRepository studentTestsRepo;
 	
-	@Autowired
-	private CourseRepository courseRepo;
+	private final CourseRepository courseRepo;
 	
-	@Autowired 
-	private TestRepository testRepo;
+	private final TestRepository testRepo;
 	
 	private String calculateGrade(BigDecimal score) {
 	    double s = score.doubleValue();

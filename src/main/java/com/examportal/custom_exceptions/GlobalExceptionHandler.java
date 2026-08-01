@@ -39,5 +39,27 @@ public class GlobalExceptionHandler {
 		
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
+	
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity<ResponseDTO<String>> handleBadRequest(BadRequestException ex){
+		ResponseDTO<String> response =
+				new ResponseDTO<>("Failed", ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+	
+	@ExceptionHandler(ForbiddenException.class)
+	public ResponseEntity<ResponseDTO<String>> handleForbidden(ForbiddenException ex){
+		ResponseDTO<String> response = new ResponseDTO<>("Failed",ex.getMessage());
+		
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+	}
+	
+	@ExceptionHandler(Exception.class)
+    public ResponseEntity<ResponseDTO<Object>> handleGeneral(Exception e) {
+        e.printStackTrace(); 
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ResponseDTO<>("Something went wrong: " + e.getMessage(), null));
+    }
 
 }

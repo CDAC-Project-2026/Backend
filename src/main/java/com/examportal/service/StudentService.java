@@ -21,5 +21,5 @@ public interface StudentService {
 	
 	String deleteAccount(DeleteAccountRequest request);
 
-	StudentDashboardDTO getDashboard(Long studentId);
+	StudentDashboardDTO getDashboard();
 }
