@@ -47,7 +47,7 @@ public class ResultsServiceImpl implements ResultsService{
 
 	    List<StudentResultDTO> results = studentTestsRepo.findStudentResultsByCourse(courseId);
 
-	    long totalTestsInCourse = testRepo.countByCoursesCourseId(courseId);
+	    long totalTestsInCourse = testRepo.countByCoursesCourseIdAndDraftFalse(courseId);
 
 	    for (StudentResultDTO r : results) {
 	        r.setGrade(calculateGrade(r.getStudentScore()));

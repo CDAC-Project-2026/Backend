@@ -93,4 +93,16 @@ public class StudentTestsController {
 	            )
 	);
 	}
+	
+	
+	@GetMapping("/courses/{courseId}/tests")
+	public ResponseEntity<ResponseDTO<List<StudentTestListDTO>>> getUnattemptedTestsForCourse(
+	        @PathVariable Long courseId) {
+	    return ResponseEntity.ok(
+	            new ResponseDTO<>(
+	            		"Success", 
+	            		studentTestsService.getUnattemptedTestsForCourse(courseId)
+	            )
+	    );
+	}
 }

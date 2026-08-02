@@ -20,4 +20,6 @@ public interface StudentTestsService {
 
 	TestResultDetailDTO getTestResult(Long testId);
 	
+	List<StudentTestListDTO> getUnattemptedTestsForCourse(Long courseId);
+	
 }

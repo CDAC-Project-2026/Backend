@@ -187,5 +187,12 @@ public class StudentTestsServiceImpl implements StudentTestsService{
 	    );
 		
 	}
+	
+	
+	@Override
+	public List<StudentTestListDTO> getUnattemptedTestsForCourse(Long courseId) {
+	    Long studentId = authUtil.getCurrentStudentId();
+	    return testRepo.findAvailableTestsForStudentAndCourse(studentId, courseId);
+	}
 
 }

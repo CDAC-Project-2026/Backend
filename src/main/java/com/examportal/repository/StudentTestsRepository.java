@@ -19,7 +19,7 @@ public interface StudentTestsRepository extends JpaRepository<StudentTests, Long
 	
 	@Query("""
 		    SELECT new com.examportal.dtos.AttemptedTestDTO(
-		        st.test.testName, st.attemptedDate, (st.studentScore * 100 / st.test.totalScore))
+		        st.test.testId, st.test.testName, st.attemptedDate, (st.studentScore * 100 / st.test.totalScore))
 		    FROM StudentTests st
 		    WHERE st.student.studentId = :studentId
 		    ORDER BY st.attemptedDate DESC
@@ -64,11 +64,12 @@ public interface StudentTestsRepository extends JpaRepository<StudentTests, Long
 
 	@Query("""
 	        SELECT new com.examportal.dtos.StudentResultDTO(
-	            s.studentId, s.name, st.studentScore, null, 0)
+            s.studentId, s.name, CAST(AVG(st.studentScore) AS big_decimal), null, 0)
 	        FROM StudentTests st
 	        JOIN st.student s
 	        WHERE st.test.courses.courseId = :courseId
-	        ORDER BY st.studentScore DESC
+	        GROUP BY s.studentId, s.name
+	        ORDER BY AVG(st.studentScore) DESC
 	        """)
 	List<StudentResultDTO> findStudentResultsByCourse(@Param("courseId") Long courseId);
 
