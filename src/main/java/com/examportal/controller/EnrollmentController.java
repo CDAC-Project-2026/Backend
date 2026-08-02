@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.examportal.dtos.EnrolledCourseResponse;
+import com.examportal.dtos.EnrolledStudentResponse;
 import com.examportal.dtos.ResponseDTO;
 import com.examportal.service.EnrollmentService;
 
@@ -31,4 +32,5 @@ public class EnrollmentController {
 	public ResponseEntity<ResponseDTO<List<EnrolledCourseResponse>>> getMyCourses(){
 		return ResponseEntity.ok(new ResponseDTO<>("Success",enrollmentService.getMyEnrollments()));
 	}
- }
+	
+  }

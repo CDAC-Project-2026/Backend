@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.examportal.dtos.CourseResponse;
 import com.examportal.dtos.CreateCourseRequest;
+import com.examportal.dtos.EnrolledStudentResponse;
 import com.examportal.dtos.ResponseDTO;
 import com.examportal.dtos.UpdateCourseRequest;
 import com.examportal.service.CourseService;
+import com.examportal.service.EnrollmentService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CourseController {
 	private final CourseService courseservice;
+	private final EnrollmentService enrollmentService;
 	
 	//create new course
 	@PostMapping
@@ -46,6 +49,16 @@ public class CourseController {
 	public ResponseEntity<ResponseDTO<CourseResponse>> getCourseById(@PathVariable Long courseId){
 		
 		return ResponseEntity.ok(new ResponseDTO<>("success", courseservice.getCourseById(courseId)));
+	}
+	
+	@GetMapping("/{courseId}/enrollments")
+	public ResponseEntity<ResponseDTO<List<EnrolledStudentResponse>>> getEnrollments(
+			@PathVariable Long courseId) {
+
+		return ResponseEntity.ok(
+				new ResponseDTO<>(
+						"Success",
+						enrollmentService.getEnrollmentForCourse(courseId)));
 	}
 	
 	//to update the course

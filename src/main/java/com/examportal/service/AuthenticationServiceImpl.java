@@ -36,5 +36,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				token,
 				"Bearer",
 				"Login successful.");
-	}
+	} 
 }

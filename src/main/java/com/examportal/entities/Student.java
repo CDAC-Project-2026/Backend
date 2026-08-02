@@ -71,5 +71,4 @@ public class Student {
 		    orphanRemoval = true
 		)
 		private List<StudentTests> studentTests = new ArrayList<>();
-
 }

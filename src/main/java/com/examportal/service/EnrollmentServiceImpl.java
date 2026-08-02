@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.examportal.custom_exceptions.ResourceAlreadyExistsException;
 import com.examportal.custom_exceptions.ResourceNotFoundException;
 import com.examportal.dtos.EnrolledCourseResponse;
+import com.examportal.dtos.EnrolledStudentResponse;
 import com.examportal.entities.Courses;
 import com.examportal.entities.Student;
 import com.examportal.entities.StudentEnrolledCourses;
@@ -68,6 +69,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 				.map(this::mapToResponse)
 				.collect(Collectors.toList());
 	}
+
+	@Override
+	public List<EnrolledStudentResponse> getEnrollmentForCourse(Long courseId) {
+		courserepo.findById(courseId).orElseThrow(()->new ResourceNotFoundException("Course Not Found"));
+		
+		return enrollmentrepo.findByCourse_CourseId(courseId)
+				.stream()
+				.map(this::mapToStudentResponse)
+				.collect(Collectors.toList());
+	}
 	
 	
 	private EnrolledCourseResponse mapToResponse(StudentEnrolledCourses enrollment) {
@@ -81,6 +92,17 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 		response.setProgress(enrollment.getProgress());
 		
 		return response; 
+	}
+	
+	private EnrolledStudentResponse mapToStudentResponse(StudentEnrolledCourses enrollment) {
+		EnrolledStudentResponse response = new EnrolledStudentResponse();
+		
+		response.setStudentId(enrollment.getStudent().getStudentId());
+		response.setName(enrollment.getStudent().getName());
+		response.setEmail(enrollment.getStudent().getEmail());
+		response.setProgress(enrollment.getProgress());
+		
+		return response;
 	}
 
 }

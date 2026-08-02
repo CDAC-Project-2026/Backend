@@ -11,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.examportal.security.CustomAuthenticationEntryPoint;
 import com.examportal.security.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class SecurityConfig {
 	
 	// Custom filter that validates JWT on every request
 	private final  JwtAuthenticationFilter jwtAuthenticationFilter ;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 	// Password encoder used to hash passwords before storing them
 	@Bean
@@ -61,6 +63,8 @@ public class SecurityConfig {
 	    	            "/student/register",
 	    	            "/student/login",
 	    	            "/admin/login",
+	    	            "/courses",
+	    	            "/courses/**",
 	    	            "/swagger-ui/**",
 	    	            "/v3/api-docs/**"
 	    	    ).permitAll()
@@ -76,6 +80,8 @@ public class SecurityConfig {
 	    	    // Any other endpoint must be authenticated.
 	    	    .anyRequest().authenticated()
 	    	)
+	    
+	    .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthenticationEntryPoint))
 	    
 	    // Execute our JWT filter before Spring's authentication filter
 	    .addFilterBefore(
