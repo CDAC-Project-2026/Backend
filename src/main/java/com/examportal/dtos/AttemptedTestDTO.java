@@ -13,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttemptedTestDTO {
+	private Long testId;
 	private String testName;
 	private LocalDateTime attempDateTime;
 	private BigDecimal scorePercentage;

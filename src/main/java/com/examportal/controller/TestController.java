@@ -100,6 +100,20 @@ public class TestController {
 	}
 	
 	
+	@GetMapping("/admin/test/{testId}")
+	public ResponseEntity<ResponseDTO<CreateTestDTO>> getTestById(@PathVariable Long testId){
+
+		return ResponseEntity.ok(
+
+	            new ResponseDTO<>(
+	                    "Success",
+	                    testService.getTestById(testId)
+	            )
+	);
+	}
+
+
+	
 	// view course wise results 
 	@GetMapping("/admin/course/{courseId}/results")
 	public ResponseEntity<ResponseDTO<CourseResultDTO>> getCoursewiseResults(@PathVariable Long courseId){		
