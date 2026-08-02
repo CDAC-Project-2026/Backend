@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.examportal.custom_exceptions.ResourceAlreadyExistsException;
 import com.examportal.custom_exceptions.ResourceNotFoundException;
 import com.examportal.dtos.CourseResponse;
 import com.examportal.dtos.CreateCourseRequest;
@@ -68,6 +69,16 @@ public class CourseServiceImpl implements CourseService {
 	public String deleteCourse(Long courseId) {
 		Courses c = courserepo.findById(courseId).orElseThrow(()->new ResourceNotFoundException("Course not found"));
 		courserepo.delete(c);
+		
+		if (!c.getStudentsEnrolled().isEmpty()
+				|| !c.getTests().isEmpty()
+				|| !c.getStudyMaterials().isEmpty()
+				|| !c.getNotifications().isEmpty()) {
+			throw new ResourceAlreadyExistsException(
+					"Cannot delete this course — it still has enrolled students, tests, "
+					+ "study materials, or notifications linked to it. Remove those first.");
+		}
+		
 		return "Course deleted successfully";
 	}
 
