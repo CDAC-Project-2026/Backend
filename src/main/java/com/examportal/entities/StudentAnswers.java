@@ -38,6 +38,6 @@ public class StudentAnswers {
 	private Questions question;
 	
 	@Column(name = "answer_option")
-	private Integer answerOption;
+	private Integer answerOption;	
 	
 }

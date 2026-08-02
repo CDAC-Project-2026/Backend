@@ -21,6 +21,8 @@ import com.examportal.dtos.LoginResponse;
 import com.examportal.dtos.ResponseDTO;
 import com.examportal.dtos.UpdateAdminProfileRequest;
 import com.examportal.dtos.UserResponse;
+import com.examportal.dtos.AdminDashboardDTO;
+
 import com.examportal.service.AdminService;
 import com.examportal.service.AuthenticationService;
 
@@ -111,5 +113,15 @@ public class AdminController {
                 new ResponseDTO<>(
                         "Success",
                         adminService.deleteUser(email)));
+    }
+  
+    @GetMapping("/dashboard")
+    public ResponseEntity<ResponseDTO<AdminDashboardDTO>> getAdminDashboard(){
+  
+	    return ResponseEntity.ok(
+	            new ResponseDTO<>(
+	                    "Success",
+	                    adminService.getDashboardData()));
+      
     }
 }

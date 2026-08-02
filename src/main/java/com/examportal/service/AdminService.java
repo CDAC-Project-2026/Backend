@@ -9,6 +9,7 @@ import com.examportal.dtos.ChangePasswordRequest;
 import com.examportal.dtos.CreateUserRequest;
 import com.examportal.dtos.UpdateAdminProfileRequest;
 import com.examportal.dtos.UserResponse;
+import com.examportal.dtos.AdminDashboardDTO;
 
 public interface AdminService {
 
@@ -25,5 +26,7 @@ public interface AdminService {
 	String updateUser(CreateUserRequest request);
 
 	String deleteUser(String email);
+  
+  AdminDashboardDTO getDashboardData();
 
 }

@@ -1,15 +1,33 @@
 package com.examportal.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.examportal.custom_exceptions.ResourceAlreadyExistsException;
+import com.examportal.custom_exceptions.*;
+
+import com.examportal.dtos.NotificationDTO;
 import com.examportal.dtos.ChangePasswordRequest;
 import com.examportal.dtos.DeleteAccountRequest;
 import com.examportal.dtos.Registration;
+import com.examportal.dtos.StudentDashboardDTO;
+import com.examportal.dtos.StudentProfileResponse;
+import com.examportal.dtos.UpdateStudentProfileRequest;
+
 import com.examportal.entities.Student;
+
 import com.examportal.enums.Role;
+
 import com.examportal.repository.StudentRepository;
+import com.examportal.repository.NotificationRepository;
+import com.examportal.repository.StudentTestsRepository;
+
 import com.examportal.security.JwtService;
+
+import com.examportal.utils.AuthUtil;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -19,9 +37,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.examportal.dtos.StudentProfileResponse;
-import com.examportal.dtos.UpdateStudentProfileRequest;
-import com.examportal.custom_exceptions.*;
+
 
 
 @Service
@@ -30,8 +46,12 @@ import com.examportal.custom_exceptions.*;
 public class StudentServiceImpl implements StudentService {
 
 	private final StudentRepository studentRepository;
+    private final StudentTestsRepository studentTestsRepo;
+    private final NotificationRepository notificationRepo;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
+	
+	private final AuthUtil authUtil;
 
 	@Override
 	public String registerStudent(Registration request) {
@@ -64,7 +84,7 @@ public class StudentServiceImpl implements StudentService {
 	public StudentProfileResponse getProfile() {
 
 		// Fetch the student from the database.
-		Student student = getCurrentStudent();
+		Student student = authUtil.getCurrentStudent();
 
 		// Convert entity to response DTO.
 		StudentProfileResponse response = new StudentProfileResponse();
@@ -80,22 +100,11 @@ public class StudentServiceImpl implements StudentService {
 	}
 	
 	
-	private Student getCurrentStudent() {
-
-		Authentication authentication =
-				SecurityContextHolder.getContext().getAuthentication();
-
-		String email = authentication.getName();
-
-		return studentRepository.findByEmail(email)
-				.orElseThrow(() ->
-						new ResourceNotFoundException("Student not found."));
-	}
 	
 	@Override
 	public String updateProfile(UpdateStudentProfileRequest request) {
 
-		Student student = getCurrentStudent();
+		Student student = authUtil.getCurrentStudent();
 
 		student.setName(request.getName());
 		student.setPhone(request.getPhone());
@@ -108,7 +117,7 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public String changePassword(ChangePasswordRequest request) {
-		Student student = getCurrentStudent();
+		Student student = authUtil.getCurrentStudent();
 		if (!passwordEncoder.matches(
 		        request.getCurrentPassword(),
 		        student.getPassword())) {
@@ -147,6 +156,23 @@ public class StudentServiceImpl implements StudentService {
 	    studentRepository.delete(student);
 
 	    return "Account deleted successfully.";
+	}
+  
+  
+  @Override
+	public StudentDashboardDTO getDashboard() {
+	  
+		Student student = authUtil.getCurrentStudent();
+
+	    List<BigDecimal> recentScores = studentTestsRepo.findRecentScores(student.getStudentId(), PageRequest.of(0, 4));
+	    List<NotificationDTO> notifications = notificationRepo.findNotificationsForStudent(student.getStudentId());
+
+	    return new StudentDashboardDTO(
+	            student.getName(),
+	            student.getStudentRank(),
+	            recentScores,
+	            notifications
+	    );
 	}
 
 	

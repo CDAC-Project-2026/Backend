@@ -6,6 +6,7 @@ import com.examportal.dtos.DeleteAccountRequest;
 import com.examportal.dtos.Registration;
 import com.examportal.dtos.StudentProfileResponse;
 import com.examportal.dtos.UpdateStudentProfileRequest;
+import com.examportal.dtos.StudentDashboardDTO;
 
 public interface StudentService {
 
@@ -19,5 +20,6 @@ public interface StudentService {
 	String changePassword(ChangePasswordRequest request);
 	
 	String deleteAccount(DeleteAccountRequest request);
-	
+
+	StudentDashboardDTO getDashboard();
 }
