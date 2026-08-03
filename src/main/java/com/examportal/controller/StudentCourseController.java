@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.examportal.dtos.CourseResponse;
 import com.examportal.dtos.ResponseDTO;
+import com.examportal.dtos.StudyMaterialResponse;
 import com.examportal.service.CourseService;
+import com.examportal.service.StudyMaterialService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class StudentCourseController {
 	
 	private final CourseService courseservice;
+	private final StudyMaterialService studyMaterialService;
 	
 	@GetMapping
 	public ResponseEntity<ResponseDTO<List<CourseResponse>>> getAllCourses(){
@@ -29,5 +32,10 @@ public class StudentCourseController {
 	@GetMapping("/{courseId}")
 	public ResponseEntity<ResponseDTO<CourseResponse>> getCourseById(@PathVariable Long courseId){
 		return ResponseEntity.ok(new ResponseDTO<>("success", courseservice.getCourseById(courseId)));
+	}	
+	
+	@GetMapping("/{courseId}/materials")
+	public ResponseEntity<ResponseDTO<List<StudyMaterialResponse>>> getMaterials(@PathVariable Long courseId) {
+		return ResponseEntity.ok(new ResponseDTO<>("Success", studyMaterialService.getMaterialsForStudent(courseId)));
 	}
 }
