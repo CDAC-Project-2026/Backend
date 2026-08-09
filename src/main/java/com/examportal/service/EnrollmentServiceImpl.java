@@ -40,24 +40,36 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 	}
 	
 	@Override
-	public String enrollInCourse(Long CourseId) {
-		Student student = getCurrentStudent(); 
-		
-		Courses course = courserepo.findById(CourseId).orElseThrow(()->new ResourceNotFoundException("Course Not found"));
-		
-		if(enrollmentrepo.existsByStudent_StudentIdAndCourse_CourseId(student.getStudentId(), CourseId)) {
-			throw new ResourceAlreadyExistsException("You are already enrolled in this course");
-		}
-		
-		StudentEnrolledCourses enrollment = new StudentEnrolledCourses();
-		enrollment.setStudent(student);
-		enrollment.setCourse(course);
-		enrollment.setEnrollmentDate(LocalDateTime.now());
-		enrollment.setProgress(BigDecimal.ZERO);
-		
-		enrollmentrepo.save(enrollment);
-		
-		return "Enrolled Successfully";
+	public String enrollInCourse(Long courseId) {
+
+	    Student student = getCurrentStudent();
+	    System.out.println("Student ID = " + student.getStudentId());
+
+	    Courses course = courserepo.findById(courseId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Course Not found"));
+
+	    System.out.println("Course ID = " + course.getCourseId());
+
+	    boolean already = enrollmentrepo.existsByStudent_StudentIdAndCourse_CourseId(
+	            student.getStudentId(), courseId);
+
+	    System.out.println("Already enrolled = " + already);
+
+	    if (already) {
+	        throw new ResourceAlreadyExistsException("Already enrolled");
+	    }
+
+	    StudentEnrolledCourses enrollment = new StudentEnrolledCourses();
+	    enrollment.setStudent(student);
+	    enrollment.setCourse(course);
+	    enrollment.setEnrollmentDate(LocalDateTime.now());
+	    enrollment.setProgress(BigDecimal.ZERO);
+
+	    enrollmentrepo.save(enrollment);
+
+	    System.out.println("Enrollment Saved!");
+
+	    return "Enrolled Successfully";
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package com.examportal.security;
 
 import java.io.IOException;
 
-import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,73 +10,87 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private final JwtService jwtService;
-	private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-	                                HttpServletResponse response,
-	                                FilterChain filterChain)
-	        throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-	    System.out.println("URL = " + request.getRequestURI());
+        String path = request.getServletPath();
 
-	    final String authHeader = request.getHeader("Authorization");
-	    System.out.println("Authorization = " + authHeader);
+        // Skip JWT validation for public endpoints
+        if (path.equals("/student/login") ||
+            path.equals("/student/register") ||
+            path.equals("/admin/login")) {
 
-	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-	        System.out.println("No Bearer token");
-	        filterChain.doFilter(request, response);
-	        return;
-	    }
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-	    final String jwt = authHeader.substring(7);
-	    System.out.println("JWT = " + jwt);
+        System.out.println("URL = " + request.getRequestURI());
 
-	    final String email = jwtService.extractUsername(jwt);
-	    System.out.println("Email = " + email);
-		
-		
+        final String authHeader = request.getHeader("Authorization");
+        System.out.println("Authorization = " + authHeader);
 
-		// Authenticate only if the user is not already authenticated.
-		if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) 
-		{
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("No Bearer Token");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-		    // Load the student details from the database using the email.
-		    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        try {
 
-		    // Verify that the token belongs to this user and has not expired.
-		    if (jwtService.isTokenValid(jwt, userDetails)) 
-		    {
+            final String jwt = authHeader.substring(7);
+            System.out.println("JWT = " + jwt);
 
-		        // Create an Authentication object after successful JWT validation.
-		        UsernamePasswordAuthenticationToken authentication =
-		                new UsernamePasswordAuthenticationToken(
-		                        userDetails, //yk what userDetails is
-		                        null, // here comes the password but yk we already verify the user
-		                        userDetails.getAuthorities()); // ikde roles yenar
+            final String email = jwtService.extractUsername(jwt);
+            System.out.println("Email = " + email);
 
-		        // Store the authenticated user for this request.
-		        SecurityContextHolder.getContext().setAuthentication(authentication);
-		    }
-		}
+            if (email != null &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
 
-		filterChain.doFilter(request, response);
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(email);
 
-	}
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities());
+
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request));
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authentication);
+                }
+            }
+
+        } catch (JwtException e) {
+
+            System.out.println("Invalid or Expired JWT : " + e.getMessage());
+
+            // Continue without authentication
+            SecurityContextHolder.clearContext();
+        }
+
+        filterChain.doFilter(request, response);
+    }
 }
