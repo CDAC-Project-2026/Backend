@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.examportal.dtos.AttemptedTestDTO;
+import com.examportal.dtos.RecentScoresDTO;
 import com.examportal.dtos.StudentResultDTO;
 import com.examportal.entities.StudentTests;
 
@@ -30,48 +31,56 @@ public interface StudentTestsRepository extends JpaRepository<StudentTests, Long
 	@Query("""
 	        SELECT st FROM StudentTests st
 	        WHERE st.student.studentId = :studentId AND st.test.testId = :testId
-	        """)
+			""")
 	    Optional<StudentTests> findByStudentIdAndTestId(@Param("studentId") Long studentId, @Param("testId") Long testId);
 	
 	
 	@Query("""
-	        SELECT st.studentScore FROM StudentTests st
+			SELECT new com.examportal.dtos.RecentScoresDTO(
+			t.testName, ROUND((st.studentScore * 100 / st.test.totalScore), 2))
+	        FROM StudentTests st
+	        JOIN st.test t
 	        WHERE st.student.studentId = :studentId
 	        ORDER BY st.attemptedDate DESC
 	        """)
-	    List<BigDecimal> findRecentScores(@Param("studentId") Long studentId, Pageable pageable);
-	
-	
+	    List<RecentScoresDTO> findRecentScores(@Param("studentId") Long studentId, Pageable pageable);
+
 	
 	// coursewise results fetch
 	@Query("""
-	        SELECT COALESCE(AVG(st.studentScore), 0) FROM StudentTests st
+	        SELECT COALESCE(AVG(st.studentScore*100/st.test.totalScore), 0) FROM StudentTests st
 	        WHERE st.test.courses.courseId = :courseId
 	        """)
 	BigDecimal findAverageScoreByCourse(@Param("courseId") Long courseId);
 
 	@Query("""
-	        SELECT COALESCE(MAX(st.studentScore), 0) FROM StudentTests st
+	        SELECT COALESCE(MAX(st.studentScore*100/st.test.totalScore), 0) FROM StudentTests st
 	        WHERE st.test.courses.courseId = :courseId
 	        """)
 	BigDecimal findHighestScoreByCourse(@Param("courseId") Long courseId);
 
 	@Query("""
-	        SELECT COALESCE(MIN(st.studentScore), 0) FROM StudentTests st
+	        SELECT COALESCE(MIN(st.studentScore*100/st.test.totalScore), 0) FROM StudentTests st
 	        WHERE st.test.courses.courseId = :courseId
 	        """)
 	BigDecimal findLowestScoreByCourse(@Param("courseId") Long courseId);
 
 	@Query("""
 	        SELECT new com.examportal.dtos.StudentResultDTO(
-            s.studentId, s.name, CAST(AVG(st.studentScore) AS big_decimal), null, 0)
+	            s.studentId, s.name, CAST(AVG(st.studentScore * 100 / st.test.totalScore) AS big_decimal), null, 0)
 	        FROM StudentTests st
 	        JOIN st.student s
 	        WHERE st.test.courses.courseId = :courseId
 	        GROUP BY s.studentId, s.name
-	        ORDER BY AVG(st.studentScore) DESC
+	        ORDER BY AVG(st.studentScore * 100 / st.test.totalScore) DESC
 	        """)
 	List<StudentResultDTO> findStudentResultsByCourse(@Param("courseId") Long courseId);
+	
+	
+	@Query("""
+	        SELECT COALESCE(AVG(st.studentScore * 100 / st.test.totalScore), 0) FROM StudentTests st
+	        """)
+	Double findOverallAverageScorePercentage();
 
 	@Query("""
 	        SELECT COUNT(st) FROM StudentTests st

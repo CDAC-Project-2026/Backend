@@ -27,6 +27,6 @@ public interface AdminService {
 
 	String deleteUser(String email);
   
-  AdminDashboardDTO getDashboardData();
+	AdminDashboardDTO getDashboardData();
 
 }

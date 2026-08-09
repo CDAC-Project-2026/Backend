@@ -10,6 +10,7 @@ import com.examportal.custom_exceptions.ResourceAlreadyExistsException;
 import com.examportal.custom_exceptions.*;
 
 import com.examportal.dtos.NotificationDTO;
+import com.examportal.dtos.RecentScoresDTO;
 import com.examportal.dtos.ChangePasswordRequest;
 import com.examportal.dtos.DeleteAccountRequest;
 import com.examportal.dtos.Registration;
@@ -24,7 +25,7 @@ import com.examportal.enums.Role;
 import com.examportal.repository.StudentRepository;
 import com.examportal.repository.NotificationRepository;
 import com.examportal.repository.StudentTestsRepository;
-
+import com.examportal.repository.StudyMaterialRepository;
 import com.examportal.security.JwtService;
 
 import com.examportal.utils.AuthUtil;
@@ -41,6 +42,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Transactional
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
+
+    private final StudyMaterialRepository studyMaterialRepository;
 
 	private final StudentRepository studentRepository;
     private final StudentTestsRepository studentTestsRepo;
@@ -161,8 +164,11 @@ public class StudentServiceImpl implements StudentService {
 	  
 		Student student = authUtil.getCurrentStudent();
 
-	    List<BigDecimal> recentScores = studentTestsRepo.findRecentScores(student.getStudentId(), PageRequest.of(0, 4));
+	    List<RecentScoresDTO> recentScores = studentTestsRepo.findRecentScores(student.getStudentId(), PageRequest.of(0, 10));
 	    List<NotificationDTO> notifications = notificationRepo.findNotificationsForStudent(student.getStudentId());
+	    
+	    System.out.println("Recent Scores : ");
+	    System.out.println(recentScores);
 
 	    return new StudentDashboardDTO(
 	            student.getName(),

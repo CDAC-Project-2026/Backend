@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,10 +23,13 @@ import com.examportal.dtos.UserResponse;
 import com.examportal.dtos.AdminDashboardDTO;
 import com.examportal.entities.Admin;
 import com.examportal.entities.Student;
+import com.examportal.entities.StudentActivityLog;
 import com.examportal.enums.Role;
 import com.examportal.repository.AdminRepository;
 import com.examportal.repository.StudentRepository;
+import com.examportal.repository.StudentTestsRepository;
 import com.examportal.repository.CourseRepository;
+import com.examportal.repository.StudentActivityLogRepository;
 import com.examportal.repository.TestRepository;
 
 import jakarta.transaction.Transactional;
@@ -44,6 +49,10 @@ public class AdminServiceImpl implements AdminService {
     private final CourseRepository courseRepo;
     
     private final TestRepository testRepo;
+    
+    private final StudentActivityLogRepository logRepo;
+    
+    private final StudentTestsRepository studentTestsRepo;
 
 	@Override
 	public AdminProfileResponse getProfile() {
@@ -268,10 +277,10 @@ public class AdminServiceImpl implements AdminService {
 		
 		System.out.println("noof student : " + noOfStudents + " no of courses : " + noOfCourses + " no of tests : " + noOfTests);
 		// average score
-		Double averageScore = 0.0;
+		Double averageScore = studentTestsRepo.findOverallAverageScorePercentage();
 		
 		// logs
-		List<String> studentLogs = new ArrayList<>(List.of("Student logged in", "Student attempted a test"));
+		List<StudentActivityLog> studentLogs = logRepo.findAllByOrderByLogTimeDesc(PageRequest.of(0, 20));
 			
 		return new AdminDashboardDTO(noOfStudents, noOfCourses, noOfTests, averageScore, studentLogs);
 	}
