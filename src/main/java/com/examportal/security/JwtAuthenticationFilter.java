@@ -6,6 +6,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -48,35 +49,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	    final String jwt = authHeader.substring(7);
 	    System.out.println("JWT = " + jwt);
 
-	    final String email = jwtService.extractUsername(jwt);
-	    System.out.println("Email = " + email);
-		
-		
+	    try {
+			final String email = jwtService.extractUsername(jwt);
+			System.out.println("Email = " + email);
+			
+			
 
-		// Authenticate only if the user is not already authenticated.
-		if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) 
-		{
+			// Authenticate only if the user is not already authenticated.
+			if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) 
+			{
 
-		    // Load the student details from the database using the email.
-		    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+			    // Load the student details from the database using the email.
+			    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-		    // Verify that the token belongs to this user and has not expired.
-		    if (jwtService.isTokenValid(jwt, userDetails)) 
-		    {
+			    // Verify that the token belongs to this user and has not expired.
+			    if (jwtService.isTokenValid(jwt, userDetails)) 
+			    {
 
-		        // Create an Authentication object after successful JWT validation.
-		        UsernamePasswordAuthenticationToken authentication =
-		                new UsernamePasswordAuthenticationToken(
-		                        userDetails, //yk what userDetails is
-		                        null, // here comes the password but yk we already verify the user
-		                        userDetails.getAuthorities()); // ikde roles yenar
+			        // Create an Authentication object after successful JWT validation.
+			        UsernamePasswordAuthenticationToken authentication =
+			                new UsernamePasswordAuthenticationToken(
+			                        userDetails, //yk what userDetails is
+			                        null, // here comes the password but yk we already verify the user
+			                        userDetails.getAuthorities()); // ikde roles yenar
 
-		        // Store the authenticated user for this request.
-		        SecurityContextHolder.getContext().setAuthentication(authentication);
-		    }
+			        // Store the authenticated user for this request.
+			        SecurityContextHolder.getContext().setAuthentication(authentication);
+			    }
+			}
+		} catch (Exception e) {
+			// so that expired or invalid tokens dont block us from logging in 
+			e.printStackTrace();
+			System.out.println("Invalid/expired JWT ignored: " + e.getMessage());
 		}
-
-		filterChain.doFilter(request, response);
+	    
+	    filterChain.doFilter(request, response);
 
 	}
 }

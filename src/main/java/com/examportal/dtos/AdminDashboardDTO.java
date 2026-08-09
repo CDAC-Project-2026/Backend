@@ -2,6 +2,8 @@ package com.examportal.dtos;
 
 import java.util.List;
 
+import com.examportal.entities.StudentActivityLog;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,5 +19,5 @@ public class AdminDashboardDTO {
 	private Long noOfCourses;
 	private Long noOfTests;
 	private Double averageScore;
-	private List<String> studentLogs;
+	private List<StudentActivityLog> studentLogs;
 }
