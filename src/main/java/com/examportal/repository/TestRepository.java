@@ -50,8 +50,6 @@ public interface TestRepository extends JpaRepository<Test, Long>{
 	Long countByCoursesCourseId(Long courseId);
 	
 	Long countByCoursesCourseIdAndDraftFalse(Long courseId);
-	
-	
 	@Query("""
 	        SELECT new com.examportal.dtos.StudentTestListDTO(
 	            t.testId, t.testName, COUNT(q), t.timeAlloted, t.totalScore, t.courses.courseName)
@@ -74,5 +72,8 @@ public interface TestRepository extends JpaRepository<Test, Long>{
 	        """)
 	List<StudentTestListDTO> findAvailableTestsForStudentAndCourse(
 	        @Param("studentId") Long studentId, @Param("courseId") Long courseId);
+	
+	
+	
 
 }

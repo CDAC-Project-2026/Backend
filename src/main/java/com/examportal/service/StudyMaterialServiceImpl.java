@@ -66,7 +66,7 @@ public class StudyMaterialServiceImpl implements StudyMaterialService {
 		try {
 			Files.createDirectories(UPLOAD_DIR);
 			
-			String filename = file.getName();
+			String filename = file.getOriginalFilename();
 			String extension = (filename != null && filename.contains(".")) ? filename.substring(filename.lastIndexOf('.')): "";
 
 			String storedFilename = UUID.randomUUID() + extension;

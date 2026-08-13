@@ -1,6 +1,7 @@
 package com.examportal.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,8 @@ import com.examportal.entities.StudentEnrolledCourses;
 import com.examportal.repository.CourseRepository;
 import com.examportal.repository.EnrollmentRepository;
 import com.examportal.repository.StudentRepository;
+import com.examportal.repository.StudentTestsRepository;
+import com.examportal.repository.TestRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 	private final StudentRepository studentrepo;
 	private final CourseRepository courserepo;
 	private final EnrollmentRepository enrollmentrepo;
+	private final TestRepository testRepo;
+	private final StudentTestsRepository studentTestsRepo;
 	
 	private Student getCurrentStudent() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -81,15 +86,32 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 	}
 	
 	
+	private BigDecimal calculateProgress(Long studentId, Long courseId) {
+		long totalTests = testRepo.countByCoursesCourseIdAndDraftFalse(courseId);
+		if(totalTests==0) {
+			return BigDecimal.ZERO;
+		}
+		
+		long attemptedTestCount=studentTestsRepo.countAttemptedTestsByStudentAndCourse(studentId, courseId);
+		
+		return BigDecimal.valueOf(attemptedTestCount)
+				.multiply(BigDecimal.valueOf(100))
+				.divide(BigDecimal.valueOf(totalTests), 0, RoundingMode.HALF_UP);
+	}
+	
+	
 	private EnrolledCourseResponse mapToResponse(StudentEnrolledCourses enrollment) {
 		EnrolledCourseResponse response = new EnrolledCourseResponse();
+		
+		Long studentId = enrollment.getStudent().getStudentId();
+		Long courseId = enrollment.getCourse().getCourseId();
 		
 		response.setEnrollmentId(enrollment.getEnrollmentId());
 		response.setCourseId(enrollment.getCourse().getCourseId());
 		response.setCourseName(enrollment.getCourse().getCourseName());
 		response.setEnrollmentDate(enrollment.getEnrollmentDate());
 		response.setDescription(enrollment.getCourse().getDescription());
-		response.setProgress(enrollment.getProgress());
+		response.setProgress(calculateProgress(studentId, courseId));
 		
 		return response; 
 	}
@@ -97,10 +119,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 	private EnrolledStudentResponse mapToStudentResponse(StudentEnrolledCourses enrollment) {
 		EnrolledStudentResponse response = new EnrolledStudentResponse();
 		
+		Long studentId = enrollment.getStudent().getStudentId();
+		Long courseId = enrollment.getCourse().getCourseId();
+		
 		response.setStudentId(enrollment.getStudent().getStudentId());
 		response.setName(enrollment.getStudent().getName());
 		response.setEmail(enrollment.getStudent().getEmail());
-		response.setProgress(enrollment.getProgress());
+		response.setProgress(calculateProgress(studentId, courseId));
 		
 		return response;
 	}

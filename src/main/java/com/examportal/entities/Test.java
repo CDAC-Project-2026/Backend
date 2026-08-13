@@ -48,7 +48,7 @@ public class Test {
     @Column(name = "time_alloted")
     private Integer timeAlloted;
     
-    @Column(name = "draft")
+    @Column(name = "draft", columnDefinition = "boolean")
     private Boolean draft;
     
     //many tests --> 1 course
